@@ -28,24 +28,19 @@ class CarteEmptyTest extends TestCase
     {
     	$user = factory(User::class)->create();
 
-    	$user->cart()->syncWithoutDetaching(
+    	$user->cart()->attach(
     		$productVariation = factory(ProductVariation::class)->create(), [
     		'quantity' => $quantity = 1
-    	],
-        $anotherproductVariation = factory(ProductVariation::class)->create(), [
-        'quantity' => $anotherquantity = 2
-      ]
+    	]
     );
 
-      $this->actingAs($user,'api');
+      $this->actingAs($user->fresh(),'api');
 
-    	$response = $this->json('DELETE', "api/cart/empty");
+    	$response = $this->json('DELETE', "api/destroy-cart");
 
     	$this->assertDatabaseMissing('cart_user', [
-            'product_variation_id' => $productVariation->id,
-            'quantity' => $quantity,
-            'product_variation_id' => $anotherproductVariation->id,
-            'quantity' => $anotherquantity
+        'product_variation_id' => $productVariation->id,
+        'quantity' => $quantity
         ]);
     }
 
