@@ -18,6 +18,15 @@ class CartController extends Controller
 			$this->middleware(['auth:api']);
 		}
 
+		public function index(Request $request, Cart $cart)
+		{
+				$request->user()->cart()->with([
+						'cart.product', 'cart.product.variations.stock','cart.stock'
+				]);
+
+				return (new CartResource($request->user()));
+		}
+
     public function store(CartStoreRequest $request, Cart $cart)
     {
     	$cart->add($request->products);
@@ -37,4 +46,7 @@ class CartController extends Controller
 		{
 			$cart->empty();
 		}
+
+
+
 }
