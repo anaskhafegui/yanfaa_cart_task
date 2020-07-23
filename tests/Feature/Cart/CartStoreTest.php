@@ -5,9 +5,12 @@ namespace Tests\Feature\Cart;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\ProductVariation;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CartStoreTest extends TestCase
 {
+    //use RefreshDatabase;
+
     public function test_it_fails_if_unauthenticated()
     {
         $this->json('POST', 'api/cart')
