@@ -56,7 +56,7 @@ class CartStoreTest extends TestCase
         $this->actingAs($user,'api');
         $this->json('POST', 'api/cart', [
           'products' => [
-            [ 'id' => 1, 'quantity' => 1 ]
+            [ 'id' => 601, 'quantity' => 1 ]
           ]
         ])
           ->assertJsonValidationErrors(['products.0.id']);
@@ -106,15 +106,5 @@ class CartStoreTest extends TestCase
         'quantity' => $quantity
       ]);
     }
-
-
-
-
-
-
-
-
-
-
 
 }

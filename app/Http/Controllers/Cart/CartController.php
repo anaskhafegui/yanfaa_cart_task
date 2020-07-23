@@ -33,5 +33,10 @@ class CartController extends Controller
 				$cart->delete($productVariation->id);
 		}
 
+		public function destroyAll(Cart $cart)
+		{
+				$cart->empty();
+		}
+
 
 }

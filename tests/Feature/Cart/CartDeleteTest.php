@@ -20,7 +20,7 @@ class CartDeleteTest extends TestCase
 
       $this->actingAs($user,'api');
 
-    	$this->json('DELETE', 'api/cart/1')
+    	$this->json('DELETE', 'api/cart/700')
         	->assertStatus(404);
     }
 
@@ -34,7 +34,7 @@ class CartDeleteTest extends TestCase
     	]);
 
       $this->actingAs($user,'api');
-      
+
     	$response = $this->json('DELETE', "api/cart/{$productVariation->id}");
 
     	$this->assertDatabaseMissing('cart_user', [

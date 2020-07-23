@@ -24,7 +24,7 @@ class CartUpdateTest extends TestCase
 
 			$this->actingAs($user,'api');
 
-			$this->json('PATCH', 'api/cart/1')
+			$this->json('PATCH', 'api/cart/600')
         	->assertStatus(404);
     }
     public function test_the_product_quantity_is_required()
