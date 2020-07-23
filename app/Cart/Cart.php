@@ -29,6 +29,10 @@ class Cart
 		]);
 	}
 
+	public function delete($productId)
+	{
+		$this->user->cart()->detach($productId);
+	}
 
 	protected function getStorePayload($products)
 	{
