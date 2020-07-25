@@ -16,7 +16,6 @@ class CreateProductVariationsTable extends Migration
         Schema::create('product_variations', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('product_id')->unsigned()->index();
-            $table->integer('product_variation_type_id')->unsigned()->index();
             $table->string('name');
             $table->integer('price')->nullable();
             $table->integer('order')->nullable();
@@ -36,6 +35,9 @@ class CreateProductVariationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_variations');
+       Schema::dropIfExists('product_variations', function(Blueprint $table){
+         $table->dropForeign('posts_user_id_foreign');
+       });
+
     }
 }

@@ -2,8 +2,19 @@
 
 
 
-Route::resource('products', 'Products\ProductsController');
+Route::resource('categories','Categories\CategoryController');
+Route::resource('products','Products\ProductController');
 
+Route::group([
+
+		'namespace' => 'Auth',
+		'prefix' => 'auth'
+
+], function ($router) {
+Route::post('register','AuthController@register');
+Route::post('login','AuthController@login');
+Route::get('me','AuthController@show');
+});
 
 
 Route::resource('cart', 'Cart\CartController', [
@@ -12,10 +23,7 @@ Route::resource('cart', 'Cart\CartController', [
 	]
 ]);
 
-Route::group([ 'prefix' => 'auth'], function () {
-	Route::post('register', 'Auth\\RegisterController@store');
+Route::DELETE('destroy-cart', 'Cart\CartController@destroyAll');
 
-	Route::post('login', 'Auth\\LoginController@store');
-
-	Route::get('me', 'Auth\\MeController@show');
-});
+Route::GET('wishlist', 'Cart\WishListController@index');
+Route::POST('wishlist/{product}', 'Cart\WishListController@toggle');

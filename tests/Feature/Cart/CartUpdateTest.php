@@ -10,8 +10,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CartUpdateTest extends TestCase
 {
-//	use RefreshDatabase;
-
 	public function test_it_fails_if_the_user_is_unauthenticated()
     {
     	$this->json('PATCH', 'api/cart/1')
@@ -22,20 +20,17 @@ class CartUpdateTest extends TestCase
     {
     	$user = factory(User::class)->create();
 
-			$this->actingAs($user,'api');
-
-			$this->json('PATCH', 'api/cart/600')
+    	$this->jsonAs($user, 'PATCH', 'api/cart/1')
         	->assertStatus(404);
     }
+
     public function test_the_product_quantity_is_required()
     {
     	$user = factory(User::class)->create();
 
     	$productVariation = factory(ProductVariation::class)->create();
 
-		   	$this->actingAs($user,'api');
-
-        $this->json('PATCH', "api/cart/{$productVariation->id}")
+        $this->jsonAs($user, 'PATCH', "api/cart/{$productVariation->id}")
         	->assertJsonValidationErrors(['quantity']);
     }
 
@@ -45,8 +40,7 @@ class CartUpdateTest extends TestCase
 
     	$productVariation = factory(ProductVariation::class)->create();
 
-        $this->actingAs($user,'api');
-        $this->json('PATCH', "api/cart/{$productVariation->id}", [
+        $this->jsonAs($user, 'PATCH', "api/cart/{$productVariation->id}", [
         	'quantity' => 'nope'
         ])
         	->assertJsonValidationErrors(['quantity']);
@@ -58,8 +52,7 @@ class CartUpdateTest extends TestCase
 
     	$productVariation = factory(ProductVariation::class)->create();
 
-				$this->actingAs($user,'api');
-        $this->json('PATCH', "api/cart/{$productVariation->id}", [
+        $this->jsonAs($user, 'PATCH', "api/cart/{$productVariation->id}", [
         	'quantity' => 0
         ])
         	->assertJsonValidationErrors(['quantity']);
@@ -75,11 +68,10 @@ class CartUpdateTest extends TestCase
     		]
     	);
 
-			$this->actingAs($user,'api');
-    	$request = $this->json('PATCH', "api/cart/{$productVariation->id}", [
+    	$request = $this->jsonAs($user, 'PATCH', "api/cart/{$productVariation->id}", [
         	'quantity' => $quantity = 2
         ]);
-
+        	
         $this->assertDatabaseHas('cart_user', [
     		'product_variation_id' => $productVariation->id,
     		'quantity' => $quantity

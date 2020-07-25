@@ -1,22 +1,33 @@
 <?php
 
 namespace App\Models;
-use App\Scoping\Scoper;
+
 use App\Models\ProductVariation;
+use App\Models\Category;
+use App\Models\Traits\CanBeScoped;
+use App\Models\Traits\HasPrice;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    use CanBeScoped,HasPrice;
+
+    public function inStock()
+    {
+        return $this->stockCount() > 0;
+    }
+
+    public function stockCount()
+    {
+        return $this->variations->sum(function ($variation) {
+            return $variation->stockCount();
+        });
+    }
+
     public function getRouteKeyName()
     {
     	return 'slug';
-    }
-
-    public function scopeWithScopes(Builder $builder, $scopes=[] ){
-       
-        return (new Scoper(request()))->apply($builder,$scopes);
-
     }
 
     public function categories()
@@ -25,10 +36,14 @@ class Product extends Model
     }
 
     public function variations()
-    {   
+    {
        return $this->hasMany(ProductVariation::class)
-        ->orderBy('order', 'asc'); 
+        ->orderBy('order', 'asc');
     }
 
+    public function users()
+    {
+       return $this->belongsToMany(User::class,'product_user');
+    }
 
 }

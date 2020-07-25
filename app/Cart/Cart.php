@@ -4,11 +4,13 @@ namespace App\Cart;
 
 use App\Cart\Money;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class Cart
 {
 	protected $user;
 
+	protected $changed = false;
 
 	public function __construct(User $user)
 	{
@@ -17,6 +19,7 @@ class Cart
 
 	public function add($products)
 	{
+
 		$this->user->cart()->syncWithoutDetaching(
     		$this->getStorePayload($products)
     	);
@@ -39,6 +42,43 @@ class Cart
 		$this->user->cart()->detach();
 	}
 
+	public function isEmpty()
+	{
+		return $this->user->cart->sum('pivot.quantity') === 0;
+	}
+
+	public function subtotal()
+	{
+		$subtotal = $this->user->cart->sum(function ($product) {
+			return $product->price->amount() * $product->pivot->quantity;
+		});
+
+		return new Money($subtotal);
+	}
+
+	public function total()
+	{
+		return $this->subtotal();
+	}
+
+	public function sync()
+	{
+		$this->user->cart->each(function ($product) {
+			$quantity = $product->minStock($product->pivot->quantity);
+
+			$this->changed = $quantity != $product->pivot->quantity;
+
+			$product->pivot->update([
+				'quantity' => $quantity
+			]);
+		});
+	}
+
+	public function hasChanged()
+	{
+		return $this->changed;
+	}
+
 	protected function getStorePayload($products)
 	{
 		return collect($products)
@@ -59,5 +99,4 @@ class Cart
 
 		return 0;
 	}
-
 }

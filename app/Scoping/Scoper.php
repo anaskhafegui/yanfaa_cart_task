@@ -17,22 +17,22 @@ class Scoper
 
 	public function apply(Builder $builder, array $scopes)
 	{
-		foreach ($scopes as $key => $scope) {
-		if (!$scope instanceof Scope) {
+		foreach ($this->limitScopes($scopes) as $key => $scope) {
+			if (!$scope instanceof Scope) {
 				continue;
 			}
-			
+
 			$scope->apply($builder, $this->request->get($key));
 		}
 
 		return $builder;
 	}
 
-	/*protected function limitScopes(array $scopes)
+	protected function limitScopes(array $scopes)
 	{
 		return array_only(
 			$scopes,
 			array_keys($this->request->all())
 		);
-	}*/
+	}
 }

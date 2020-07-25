@@ -18,9 +18,7 @@ class CartDeleteTest extends TestCase
     {
     	$user = factory(User::class)->create();
 
-      $this->actingAs($user,'api');
-
-    	$this->json('DELETE', 'api/cart/700')
+    	$this->jsonAs($user, 'DELETE', 'api/cart/1')
         	->assertStatus(404);
     }
 
@@ -33,9 +31,7 @@ class CartDeleteTest extends TestCase
     		'quantity' => $quantity = 1
     	]);
 
-      $this->actingAs($user,'api');
-
-    	$response = $this->json('DELETE', "api/cart/{$productVariation->id}");
+    	$response = $this->jsonAs($user, 'DELETE', "api/cart/{$productVariation->id}");
 
     	$this->assertDatabaseMissing('cart_user', [
             'product_variation_id' => $productVariation->id,

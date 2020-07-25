@@ -2,38 +2,42 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Http\Resources\PrivateUserResource;
+use App\Http\Requests\Auth\LoginRequest;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
+  /**
+* Create a new AuthController instance.
+*
+* @return void
+*/
+public function __construct()
+{
+   $this->middleware('auth:api', ['except' => ['login','register']]);
+}
 
-    use AuthenticatesUsers;
+public function login(LoginRequest $request)
+{
+  $credentials = $request->only('email', 'password');
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
+  if (!$token = auth()->attempt($credentials)) {
+    return response()->json([
+      'errors' => [
+        'email' => ['Could not sign you in with those details.']
+      ]
+    ], 422);
+  }
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
-    }
+  return (new PrivateUserResource($request->user()))
+    ->additional([
+      'meta' => [
+        'token' => $this->respondWithToken($token)
+      ]
+    ]);
+}
 }

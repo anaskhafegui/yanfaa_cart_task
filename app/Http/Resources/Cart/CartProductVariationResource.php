@@ -20,12 +20,12 @@ class CartProductVariationResource extends ProductVariationResource
         return array_merge(parent::toArray($request), [
             'product' => new ProductIndexResource($this->product),
             'quantity' => $this->pivot->quantity,
-            'total' => $this->getTotal()
+            'total' => $this->getTotal()->formatted()
         ]);
     }
 
     protected function getTotal()
     {
-        return $this->pivot->quantity * $this->price;
+        return new Money($this->pivot->quantity * $this->price->amount());
     }
 }

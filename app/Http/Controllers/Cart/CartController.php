@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Cart\CartResource;
 use App\Http\Requests\Cart\CartStoreRequest;
 use App\Http\Requests\Cart\CartUpdateRequest;
+use Illuminate\Support\Facades\Auth;
 
 
 class CartController extends Controller
@@ -19,13 +20,18 @@ class CartController extends Controller
 		}
 
 		public function index(Request $request, Cart $cart)
-		{
-				$request->user()->cart()->with([
-						'cart.product', 'cart.product.variations.stock','cart.stock'
-				]);
+    {
+        $cart->sync();
 
-				return (new CartResource($request->user()));
-		}
+        $request->user()->load([
+            'cart.product', 'cart.product.variations.stock', 'cart.stock', 'cart.type'
+        ]);
+
+        return (new CartResource($request->user()))
+            ->additional([
+                'meta' => $this->meta($cart)
+            ]);
+    }
 
     public function store(CartStoreRequest $request, Cart $cart)
     {
@@ -47,6 +53,14 @@ class CartController extends Controller
 			$cart->empty();
 		}
 
-
+		protected function meta(Cart $cart)
+    {
+        return [
+            'empty' => $cart->isEmpty(),
+            'subtotal' => $cart->subtotal()->formatted(),
+            'total' => $cart->total()->formatted(),
+            'changed' => $cart->hasChanged()
+        ];
+    }
 
 }
