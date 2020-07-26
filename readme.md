@@ -1,72 +1,69 @@
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
+### Introduction
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+   Ecommerce project with stunning performance, with shopping cart deal with most cases scenarios that business need it, all functionality was tested.
+    
+### Technology
 
-## About Laravel
+<ul>
+    <li>APIS by Laravel 5.8</li>
+     <li><a href="https://laravelsd.com">Laravelsd database analysis</a></li>
+    <li>MYSQL</li>
+    <li>JWT</li>
+    <li>JS</li>
+</ul>
+My database structure was about saleing products and every product has a variations products and every variation product has different variation type like normal product or sale product and aslo product variations has many stock and created live view table to catch any changes will happen to product quantity re-evaluateing when add product to the cart and when it's remove re-evaluated again. 
+Its good for user experience to know how many products are available to buy.
+   
+### Details
+## Database relations
+    o products many to many with categories
+    o products one to many with product variations 
+    o products variations one to many with product variations type
+    o products variation  one to many with stock
+    o user many to many with cart 
+    o user one to many with order
+    o order many to many with products 
+    
+## traits   
+    o CanBeScoped   //  used as daynmaic filter for models  
+    o Orderable    //  use for any model need to be orderable
+    o HasPrice     //  used money php class to format price depending on currency type
+    o HasChildren  // used to get any children of model 
+    
+## interface    
+    o Cartinterface // Add Remove Empty
+    
+## classes    
+    o ShoppingCart implements Cartinterface
+    o WishlistCart implements Cartinterface
+    o Money   //PHP CLASS
+    
+### Installation
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Windows users:
+- Download wamp: http://www.wampserver.com/en/
+- Download and extract cmder mini: https://github.com/cmderdev/cmder/releases/download/v1.1.4.1/cmder_mini.zip
+- Update windows environment variable path to point to your php install folder (inside wamp installation dir) (here is how you can do this http://stackoverflow.com/questions/17727436/how-to-properly-set-php-environment-variable-to-run-commands-in-git-bash)
+ 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+cmder will be refered as console
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+##Mac Os, Ubuntu and windows users continue here:
+- Create a database locally named `root` utf8_general_ci 
+- setup mysql db for testing or test in memory 
+- Download composer https://getcomposer.org/download/
+- Pull Laravel/php project from git provider.
+- Rename `.env.example` file to `.env`inside your project root and fill the database information.
+  (windows wont let you do it, so you have to open your console cd your project root directory and run `mv .env.example .env` )
+- Open the console and cd your project root directory
+- Run `composer install` or ```php composer.phar install```
+- Run `php artisan key:generate` 
+- Run `php artisan migrate`
+- Run `./vendor/bin/phpunit` make sure all tests passing successfully 
+- Run `php artisan serve`
 
-## Learning Laravel
+#####You can now access your project at localhost:8000 :)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-- [Hyper Host](https://hyper.host)
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## If for some reason your project stop working do these:
+- `composer install`
+- `php artisan migrate`
