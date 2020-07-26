@@ -5,8 +5,9 @@ namespace App\Cart;
 use App\Cart\Money;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use App\Cart\CartInterFace;
 
-class Cart
+class Cart implements CartInterFace
 {
 	protected $user;
 
@@ -19,7 +20,6 @@ class Cart
 
 	public function add($products)
 	{
-
 		$this->user->cart()->syncWithoutDetaching(
     		$this->getStorePayload($products)
     	);

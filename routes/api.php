@@ -25,5 +25,16 @@ Route::resource('cart', 'Cart\CartController', [
 
 Route::DELETE('destroy-cart', 'Cart\CartController@destroyAll');
 
-Route::GET('wishlist', 'Cart\WishListController@index');
-Route::POST('wishlist/{product}', 'Cart\WishListController@toggle');
+Route::resource('wishlist', 'Cart\WishListController', [
+	'parameters' => [
+		'wishlist' => 'product'
+	]
+]);
+
+Route::GET('wishlist','Cart\WishCartController@index');
+
+Route::POST('wishlist/{product}','Cart\WishCartController@update');
+
+Route::DELETE('wishlist/{product}', 'Cart\WishCartController@destroy');
+
+Route::DELETE('destroy-wishlist', 'Cart\WishCartController@destroyAll');

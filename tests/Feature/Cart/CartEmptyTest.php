@@ -6,7 +6,7 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\ProductVariation;
 
-class CarteEmptyTest extends TestCase
+class CartEmptyTest extends TestCase
 {
     public function test_it_fails_if_the_user_is_unauthenticated()
     {
@@ -32,11 +32,19 @@ class CarteEmptyTest extends TestCase
     	]
     );
 
+    $user->cart()->attach(
+      $productVariation1 = factory(ProductVariation::class)->create(), [
+      'quantity' => $quantity1 = 1
+    ]
+  );
+
     	$response = $this->jsonAs($user,'DELETE', "api/destroy-cart");
 
     	$this->assertDatabaseMissing('cart_user', [
         'product_variation_id' => $productVariation->id,
-        'quantity' => $quantity
+        'quantity' => $quantity,
+        'product_variation_id' => $productVariation1->id,
+        'quantity' => $quantity1
         ]);
     }
 

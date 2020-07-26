@@ -12,7 +12,10 @@ class CartUpdateTest extends TestCase
 {
 	public function test_it_fails_if_the_user_is_unauthenticated()
     {
-    	$this->json('PATCH', 'api/cart/1')
+			$this->withHeaders([
+						'Accept' => 'application/json',
+				])->
+	         json('PATCH', 'api/cart/1')
         	->assertStatus(401);
     }
 
@@ -71,7 +74,7 @@ class CartUpdateTest extends TestCase
     	$request = $this->jsonAs($user, 'PATCH', "api/cart/{$productVariation->id}", [
         	'quantity' => $quantity = 2
         ]);
-        	
+
         $this->assertDatabaseHas('cart_user', [
     		'product_variation_id' => $productVariation->id,
     		'quantity' => $quantity
