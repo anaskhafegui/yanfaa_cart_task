@@ -11,15 +11,15 @@
     <li>JWT</li>
     <li>JS</li>
 </ul>
-My database structure was about saleing products and every product has a variations products and every variation product has different variation type like normal product or sale product and aslo product variations has many stock and created live view table to catch any changes will happen to product quantity re-evaluateing when add product to the cart and when it's remove re-evaluated again. 
-Its good for user experience to know how many products are available to buy.
-   
-### Details
+
+my project structure was about selling products and every product has a variations products and every variation product has different variation type like normal product or sale product and aslo product variations has many stock and aslo created live view table to catch any changes will happen to product quantity by re-compute quantities had been rested in stock after add to cart and when it's remove from cart also recomputed again,
+Its good for user experience and to know how many products are available to buy and business owner to mange this products quantity. 
+## Details
 ## Database relations
     o products many to many with categories
     o products one to many with product variations 
-    o products variations one to many with product variations type
-    o products variation  one to many with stock
+    o products variations one to one with product variations type 
+    o products variation one to many with stock
     o user many to many with cart 
     o user one to many with order
     o order many to many with products 
@@ -31,7 +31,7 @@ Its good for user experience to know how many products are available to buy.
     o HasChildren  // used to get any children of model 
     
 ## interface    
-    o Cartinterface // Add Remove Empty
+    o Cartinterface // Add Remove Empty methods
     
 ## classes    
     o ShoppingCart implements Cartinterface
