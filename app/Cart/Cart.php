@@ -2,101 +2,116 @@
 
 namespace App\Cart;
 
-use App\Cart\Money;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use App\Cart\CartInterFace;
 
 class Cart implements CartInterFace
 {
-	protected $user;
+    protected $user;
 
-	protected $changed = false;
+    protected static $tax = 0.14;
 
-	public function __construct(User $user)
-	{
-		$this->user = $user;
-	}
+    protected $changed = false;
 
-	public function add($products)
-	{
-		$this->user->cart()->syncWithoutDetaching(
-    		$this->getStorePayload($products)
-    	);
-	}
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
 
-	public function update($productId, $quantity)
-	{
-		$this->user->cart()->updateExistingPivot($productId, [
-			'quantity' => $quantity
-		]);
-	}
+    public function add($products)
+    {
+        $this->user->cart()->syncWithoutDetaching(
+            $this->getStorePayload($products)
+        );
+    }
 
-	public function delete($productId)
-	{
-		$this->user->cart()->detach($productId);
-	}
+    public function update($productId, $quantity)
+    {
+        $this->user->cart()->updateExistingPivot($productId, [
+            'quantity' => $quantity
+        ]);
+    }
 
-	public function empty()
-	{
-		$this->user->cart()->detach();
-	}
+    public function delete($productId)
+    {
+        $this->user->cart()->detach($productId);
+    }
 
-	public function isEmpty()
-	{
-		return $this->user->cart->sum('pivot.quantity') === 0;
-	}
+    public function empty()
+    {
+        $this->user->cart()->detach();
+    }
 
-	public function subtotal()
-	{
-		$subtotal = $this->user->cart->sum(function ($product) {
-			return $product->price->amount() * $product->pivot->quantity;
-		});
+    public function isEmpty()
+    {
+        return $this->user->cart->sum('pivot.quantity') === 0;
+    }
 
-		return new Money($subtotal);
-	}
+    public function subtotal($currencyType = 'USD')
+    {
+        $subtotal = $this->user->cart->sum(function ($product) {
+            return $product->price->amount() * $product->pivot->quantity;
+        });
 
-	public function total()
-	{
-		return $this->subtotal();
-	}
+        return  $this->currencyConversion($subtotal, $currencyType);
+    }
 
-	public function sync()
-	{
-		$this->user->cart->each(function ($product) {
-			$quantity = $product->minStock($product->pivot->quantity);
+    public function total($currencyType)
+    {
+        return $this->subtotal($currencyType);
+    }
 
-			$this->changed = $quantity != $product->pivot->quantity;
+    public function sync()
+    {
+        $this->user->cart->each(function ($product) {
+            $quantity = $product->minStock($product->pivot->quantity);
 
-			$product->pivot->update([
-				'quantity' => $quantity
-			]);
-		});
-	}
+            $this->changed = $quantity != $product->pivot->quantity;
 
-	public function hasChanged()
-	{
-		return $this->changed;
-	}
+            $product->pivot->update([
+                'quantity' => $quantity
+            ]);
+        });
+    }
 
-	protected function getStorePayload($products)
-	{
-		return collect($products)
-    		->keyBy('id')
-    		->map(function ($product) {
-    			return [
-    				'quantity' => $product['quantity'] + $this->getCurrentQuantity($product['id'])
-    			];
-    		})
-    		->toArray();
-	}
+    public function hasChanged()
+    {
+        return $this->changed;
+    }
 
-	protected function getCurrentQuantity($productId)
-	{
-		if ($product = $this->user->cart->where('id', $productId)->first()) {
-			return $product->pivot->quantity;
-		}
+    protected function getStorePayload($products)
+    {
+        return collect($products)
+            ->keyBy('id')
+            ->map(function ($product) {
+                return [
+                    'quantity' => $product['quantity'] + $this->getCurrentQuantity($product['id'])
+                ];
+            })
+            ->toArray();
+    }
 
-		return 0;
-	}
+    protected function getCurrentQuantity($productId)
+    {
+        if ($product = $this->user->cart->where('id', $productId)->first()) {
+            return $product->pivot->quantity;
+        }
+
+        return 0;
+    }
+
+    public function getCurrentTaxes($currencyType)
+    {
+        return  new Money(floor($this->subtotal()->amount() / self::$tax), $currencyType);
+    }
+
+    public function currencyConversion($subtotal, $currencyType)
+    {
+        if ($currencyType == 'EUR') {
+            return   new Money($subtotal * 1.5, $currencyType);
+        } elseif ($currencyType == 'EGP') {
+            return new Money($subtotal * 16, $currencyType);
+        } else {
+            return   new Money($subtotal);
+        }
+    }
 }

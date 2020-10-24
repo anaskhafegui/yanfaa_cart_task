@@ -6,6 +6,7 @@ use App\Cart\Money;
 use Tests\TestCase;
 use App\Models\Stock;
 use App\Models\Product;
+use App\Models\Offer;
 use App\Models\Category;
 use App\Models\ProductVariation;
 
@@ -23,10 +24,21 @@ class ProductTest extends TestCase
         $product = factory(Product::class)->create();
 
         $product->categories()->save(
-        	factory(Category::class)->create()
+            factory(Category::class)->create()
         );
 
         $this->assertInstanceOf(Category::class, $product->categories->first());
+    }
+
+    public function test_it_has_one_offer()
+    {
+        $product = factory(Product::class)->create();
+
+        $product->offer()->save(
+            factory(Offer::class)->create()
+        );
+
+        $this->assertInstanceOf(Offer::class, $product->offer->first());
     }
 
     public function test_it_has_many_variations()

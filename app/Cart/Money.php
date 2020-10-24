@@ -10,25 +10,32 @@ use Money\Formatter\IntlMoneyFormatter;
 
 class Money
 {
-	protected $money;
+    protected $money;
+    protected $currencyType;
 
-	public function __construct($value)
-	{
-		$this->money = new BaseMoney($value, new Currency('USD'));
-	}
+    public function __construct($value, $currencyType = 'USD')
+    {
+        $this->money = new BaseMoney($value, new Currency($currencyType));
+        $this->currencyType = $currencyType;
+    }
 
-	public function amount()
-	{
-		return $this->money->getAmount();
-	}
+    public function amount()
+    {
+        return $this->money->getAmount();
+    }
 
-	public function formatted()
-	{
-		$formatter = new IntlMoneyFormatter(
+    public function formatted()
+    {
+        $formatter = new IntlMoneyFormatter(
             new NumberFormatter('en_US', NumberFormatter::CURRENCY),
             new ISOCurrencies()
         );
 
         return $formatter->format($this->money);
-	}
+    }
+
+    public function divide($precentage)
+    {
+        return $this->money->divide($precentage);
+    }
 }

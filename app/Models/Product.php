@@ -2,11 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\ProductVariation;
-use App\Models\Category;
 use App\Models\Traits\CanBeScoped;
 use App\Models\Traits\HasPrice;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -27,23 +24,27 @@ class Product extends Model
 
     public function getRouteKeyName()
     {
-    	return 'slug';
+        return 'slug';
     }
 
     public function categories()
     {
-    	return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Category::class);
     }
 
     public function variations()
     {
-       return $this->hasMany(ProductVariation::class)
+        return $this->hasMany(ProductVariation::class)
         ->orderBy('order', 'asc');
     }
 
     public function users()
     {
-       return $this->belongsToMany(User::class,'product_user');
+        return $this->belongsToMany(User::class, 'product_user');
     }
 
+    public function offer()
+    {
+        return $this->hasOne(Offer::class, 'product_id');
+    }
 }

@@ -7,32 +7,31 @@ use App\Http\Resources\ProductResource;
 use App\Http\Controllers\Controller;
 use App\Scoping\Scopes\CategoryScope;
 use App\Models\Product;
-use Illuminate\Http\Request;
-
 
 class ProductController extends Controller
 {
     public function index()
     {
-    	$products = Product::with(['variations.stock'])
+        $products = Product::with(['variations.stock'])
               ->withScopes($this->scopes())
               ->paginate(10);
 
-    	return ProductIndexResource::collection($products);
+        return ProductIndexResource::collection($products);
     }
+
     public function show(Product $product)
     {
-      $product->load(['variations.type', 'variations.stock', 'variations.product']);
+        $product->load(['variations.type', 'variations.stock', 'variations.product']);
 
-    	return new ProductResource(
+        return new ProductResource(
             $product
         );
     }
+
     protected function scopes()
     {
-    	return [
-    		'category' => new CategoryScope()
-    	];
+        return [
+            'category' => new CategoryScope()
+        ];
     }
-
 }
