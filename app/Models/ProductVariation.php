@@ -64,4 +64,14 @@ class ProductVariation extends Model
     {
         return min($this->stockCount(), $count);
     }
+
+    public function offer()
+    {
+        return $this->hasOne(Offer::class);
+    }
+
+    public function relatedOffer()
+    {
+        return $this->hasOne(Offer::class, 'related_offer_product_id');
+    }
 }

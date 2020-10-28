@@ -3,7 +3,6 @@
 namespace Tests\Unit\Models\Products;
 
 use Tests\TestCase;
-use App\Models\Product;
 use App\Models\Offer;
 
 class OfferTest extends TestCase
@@ -12,6 +11,6 @@ class OfferTest extends TestCase
     {
         $offer = factory(Offer::class)->create();
 
-        $this->assertInstanceOf(Product::class, $offer->product);
+        $this->assertInstanceOf(ProductVariation::class, $offer->product);
     }
 }

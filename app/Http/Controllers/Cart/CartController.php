@@ -22,12 +22,16 @@ class CartController extends Controller
         $cart->sync();
 
         $request->user()->load([
-            'cart.product', 'cart.product.variations.stock', 'cart.stock', 'cart.type'
+            'cart.product', 'cart.product.variations.stock', 'cart.stock', 'cart.type', 'cart.product.variations.offer'
         ]);
 
-        return (new CartResource($request->user()))
+        $userCart = new CartResource($request->user());
+
+        $offers = $this->getCartProductsHasOffer($userCart);
+
+        return ($userCart)
             ->additional([
-                'meta' => $this->meta($cart, $this->currencyCheck($request->currencyType))
+                'meta' => $this->meta($cart, $this->currencyCheck($request->currencyType), $offers)
             ]);
     }
 
@@ -51,15 +55,46 @@ class CartController extends Controller
         $cart->empty();
     }
 
-    protected function meta(Cart $cart, $currencyType)
+    protected function meta(Cart $cart, $currencyType, $offers)
     {
-        return [
+        $meta = [
             'empty' => $cart->isEmpty(),
             'subtotal' => $cart->subtotal($currencyType)->formatted(),
             'Taxes' => $cart->getCurrentTaxes($currencyType)->formatted(),
             'total' => $cart->total($currencyType)->formatted(),
-            'changed' => $cart->hasChanged()
+            'changed' => $cart->hasChanged(),
         ];
+        //where->pivot->quantity;
+        if ($offers) {
+            $discount = $cart->CalculateOffers($offers, $currencyType);
+
+            $meta['discount'] = $discount;
+        }
+
+        return $meta;
+    }
+
+    private function checkamountofofferproductexistinCart($offer)
+    {
+        // dd($offer['offer']['amount']);
+        return ($offer->pivot->where('product_variation_id', '=', $offer['offer']['related_offer_product_id'])->first()->quantity >= $offer['offer']['amount']);
+    }
+
+    private function getCartProductsHasOffer($userCart)
+    {
+        $offerProducts = [];
+        foreach ($userCart->cart as $key => $offerProduct) {
+            if ($userCart->cart[$key]->offer && $this->checkamountofofferproductexistinCart($userCart->cart[$key])) {
+                $offerProducts[] = $offerProduct->only('offer');
+            }
+        }
+
+        return  $this->checkCartProductsHasOffer($offerProducts);
+    }
+
+    private function checkCartProductsHasOffer($offerProducts)
+    {
+        return  empty(!$offerProducts) ? $offerProducts : false;
     }
 
     private function currencyCheck($currencyType)

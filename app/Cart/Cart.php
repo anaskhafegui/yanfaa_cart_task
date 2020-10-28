@@ -8,6 +8,8 @@ class Cart implements CartInterFace
 {
     protected $user;
 
+    protected $totalofferPrice = 0;
+
     protected static $tax = 0.14;
 
     protected $changed = false;
@@ -57,7 +59,7 @@ class Cart implements CartInterFace
 
     public function total($currencyType)
     {
-        return $this->subtotal($currencyType);
+        return new Money($this->subtotal($currencyType)->amount() - $this->getCurrentTaxes($currencyType)->amount(), $currencyType);
     }
 
     public function sync()
@@ -99,19 +101,38 @@ class Cart implements CartInterFace
         return 0;
     }
 
-    public function getCurrentTaxes($currencyType)
+    public function CalculateOffers($offers, $currencyType)
     {
-        return  new Money(floor($this->subtotal()->amount() / self::$tax), $currencyType);
+        $totalofferAmount = '';
+
+        foreach ($offers as  $offer) {
+            if ($offer['offer']['offer_type'] == 'self') {
+                $discount = $this->currencyConversion($this->getCurrentQuantity($offer['offer']['product_variation_id']) / $offer['offer']['amount'] * $offer['offer']['product']->price * ($offer['offer']['precentges'] / 100), $currencyType);
+                $this->totalofferPrice += $discount->amount();
+                $totalofferAmount .= $offer['offer']['precentges'] . '%  off ' . $offer['offer']['product']->name . ': -' . $discount->formatted() . '           ';
+            } else {
+                $discount = $this->currencyConversion((int)min($this->getCurrentQuantity($offer['offer']['related_offer_product_id']) / $offer['offer']['amount'], $this->getCurrentQuantity($offer['offer']['product_variation_id'])) * $offer['offer']['product']->price * $offer['offer']['precentges'] / 100, $currencyType);
+                $this->totalofferPrice += $discount->amount();
+                $totalofferAmount .= $offer['offer']['precentges'] . '%  off ' . $offer['offer']['product']->name . ': -' . $discount->formatted() . '             ';
+            }
+        }
+
+        return $totalofferAmount;
     }
 
-    public function currencyConversion($subtotal, $currencyType)
+    public function getCurrentTaxes($currencyType)
+    {
+        return  $this->currencyConversion($this->subtotal()->amount() * self::$tax, $currencyType);
+    }
+
+    private function currencyConversion($price, $currencyType)
     {
         if ($currencyType == 'EUR') {
-            return   new Money($subtotal * 1.5, $currencyType);
+            return   new Money(floor($price * 1.5), $currencyType);
         } elseif ($currencyType == 'EGP') {
-            return new Money($subtotal * 16, $currencyType);
+            return new Money(floor($price * 16), $currencyType);
         } else {
-            return   new Money($subtotal);
+            return   new Money($price);
         }
     }
 }

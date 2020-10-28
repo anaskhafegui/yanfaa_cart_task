@@ -15,9 +15,22 @@ class CreateOffersTable extends Migration
     {
         Schema::create('offers', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('product_id');
+            $table->integer('product_variation_id')->unsigned()->index();
+            $table->integer('related_offer_product_id')->unsigned()->index();
+            $table->integer('amount');
+
             $table->integer('precentges');
             $table->timestamps();
+
+            $table->foreign('product_variation_id')
+            ->references('id')
+            ->on('product_variations')
+            ->onDelete('cascade');
+
+            $table->foreign('related_offer_product_id')
+            ->references('id')
+            ->on('product_variations')
+            ->onDelete('cascade');
         });
     }
 
